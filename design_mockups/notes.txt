@@ -1,0 +1,42 @@
+// LOGGER
+[Event]: something happened!
+
+// TABLE
++-----+------+
+|  i  | CHAR |
++-----+------+
+| 001 | Mino |
+| 002 | Haru |
+| 003 | Airi |
+| 004 | Shii |
++-----+------+
+
++-----+------+-------+
+|  i  | FOOD | PRICE |
++-----+------+-------+
+| 001 | BURG | $8.30 |
+| 002 | STK  | $8.30 |
+| 003 | RICE | $8.30 |
+| 004 | MALA | $8.30 |
++-----+------+-------+
+
+// CHOICES
++-------------+
+| Leo/Needies |
++-------------+
+
+(1) Hoshino Ichika
+(2) Tenma Saki
+(3) Hinomori Shiho
+(4) Mochizuki Honami
+
+// STATISTICS
++------+-------+
+| Stat | FavNo |
++------+-------+
+| Ichi | 3939  |
+| Haru | Pingu |
++------+-------+
+
+// INPUT
+>> Should we watch the stars together again? (Y/N): 
