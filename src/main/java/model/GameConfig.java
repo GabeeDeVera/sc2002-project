@@ -28,7 +28,14 @@ public class GameConfig {
     ArrayList<Customer> newCustomers = new ArrayList<>();
 
     if(turnIndex % 3 == 0) {
-      newCustomers.add(new RegularCustomer(turnIndex));
+      int arrivalNumber = turnIndex / 3;
+      if(arrivalNumber == 1) {
+        newCustomers.add(new VIPCustomer(turnIndex));
+      } else if(arrivalNumber == 2) {
+        newCustomers.add(new CriticCustomer(turnIndex));
+      } else {
+        newCustomers.add(new RegularCustomer(turnIndex));
+      }
     }
 
     return newCustomers;
