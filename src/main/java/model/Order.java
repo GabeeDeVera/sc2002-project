@@ -5,12 +5,18 @@ public class Order {
   private MenuItem item;
   private int unitsLeft;
   private OrderState state;
+  private final int billCents;
 
   public Order(Customer theCustomer, MenuItem theItem) {
+    this(theCustomer, theItem, theItem.getPriceCents());
+  }
+
+  public Order(Customer theCustomer, MenuItem theItem, int theBillCents) {
     customer = theCustomer;
     item = theItem;
     unitsLeft = theItem.getPreparationUnits();
     state = OrderState.PLACED;
+    billCents = theBillCents;
   }
 
   public void sendToKitchen() {
@@ -48,7 +54,7 @@ public class Order {
   }
 
   public int getBillCents() {
-    return item.getPriceCents();
+    return billCents;
   }
 
   public OrderState getState() {

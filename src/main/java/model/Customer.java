@@ -28,6 +28,10 @@ public abstract class Customer {
 
   public abstract MenuItem chooseItem(Menu menu);
 
+  public int getPriceMultiplierPercent() {
+    return 100;
+  }
+
   public void leave() {
     if(state == CustomerState.WAITING || state == CustomerState.SEATED || state == CustomerState.ORDERED) {
       state = CustomerState.LEFT;
