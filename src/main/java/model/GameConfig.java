@@ -20,6 +20,7 @@ public class GameConfig {
 
     staff = new ArrayList<Staff>();
     staff.add(new Waiter());
+    staff.add(new Host());
     staff.add(new Chef());
     staff.add(new Cashier());
   }
@@ -61,6 +62,8 @@ public class GameConfig {
     menuItems.add(new MenuItem("Salad", Price.dollars(9), 1));
     menuItems.add(new MenuItem("Burger", Price.dollars(15), 1));
     menuItems.add(new MenuItem("Pasta", Price.dollars(18), 2));
+    menuItems.add(new ComboMeal(menuItems.get(0), menuItems.get(1)));
+    menuItems.add(new ComboMeal(menuItems.get(1), menuItems.get(2)));
 
     return new Menu(menuItems);
   }

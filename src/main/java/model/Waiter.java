@@ -48,10 +48,7 @@ public class Waiter extends Staff {
 
     MenuItem orderedItem = customer.chooseItem(gameState.getMenu());
 
-    int billCents = (int)Math.round(
-      orderedItem.getPriceCents() * customer.getPriceMultiplierPercent() / 100.0
-    );
-    Order newOrder = new Order(customer, orderedItem, billCents);
+    Order newOrder = new Order(customer, orderedItem, gameState.getOrderPriceCents(customer, orderedItem));
 
     gameState.addOrder(newOrder);
     customer.setOrder(newOrder);

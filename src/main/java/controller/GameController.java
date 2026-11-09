@@ -10,6 +10,7 @@ import src.main.java.model.Customer;
 import src.main.java.model.CustomerState;
 import src.main.java.model.GameConfig;
 import src.main.java.model.GameState;
+import src.main.java.model.Host;
 import src.main.java.model.Order;
 import src.main.java.model.OrderState;
 import src.main.java.model.Scoreboard;
@@ -26,6 +27,7 @@ public class GameController {
   private GameConfig gameConfig;
   private GameState state;
   private Scoreboard scoreboard;
+  private boolean happyHourUsed;
 
   public GameController() {
     cli = new GameCLI();
@@ -70,13 +72,23 @@ public class GameController {
       );
       
       cli.showBoxedMessage("Arrivals, Payment, and Eating");
+      if(!happyHourUsed) {
+        boolean activateHappyHour = cli.yesNoInput("Activate Happy Hour for this turn and the next?");
+        if(activateHappyHour) {
+          state.activateHappyHour();
+          happyHourUsed = true;
+          cli.logEvent("Happy Hour is active for this turn and the next");
+        }
+      }
       processArrivals();
+      state.recoverWaitingSatisfaction();
       processPayment();
       processEating();
       cli.logGeneric("An empty log means that nothing happened.");
       cli.confirmationInput();
       showInitStats();
       cli.confirmationInput();
+      processHostActions();
       processWaiterActions();
       cli.confirmationInput();
       processChefActions();
@@ -105,6 +117,15 @@ public class GameController {
   private void gameSetup() {
     state = new GameState(gameConfig);
     scoreboard = new Scoreboard();
+    happyHourUsed = false;
+  }
+
+  private void processHostActions() {
+    for(Host host : state.getStaffOfClassType(Host.class)) {
+      if(host.seatNextCustomer(state)) {
+        cli.logGeneric("Host 1 seated the next customer");
+      }
+    }
   }
 
   private void processArrivals() {

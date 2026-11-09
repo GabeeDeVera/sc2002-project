@@ -13,6 +13,7 @@ public class GameState {
   private ArrayList<Customer> customerList;
   private ArrayList<Order> orders;
   private int turnIndex;
+  private int happyHourTurnsRemaining;
 
   public GameState(GameConfig theConfig) {
     config = theConfig;
@@ -28,6 +29,7 @@ public class GameState {
     orders = new ArrayList<>();
 
     turnIndex = 0;
+    happyHourTurnsRemaining = 0;
   }
 
   public ArrayList<Table> getTables() {
@@ -57,6 +59,25 @@ public class GameState {
 
   public Menu getMenu() {
     return config.getMenu(turnIndex);
+  }
+
+  public void activateHappyHour() {
+    if(happyHourTurnsRemaining == 0) happyHourTurnsRemaining = 2;
+  }
+
+  public boolean isHappyHourActive() { return happyHourTurnsRemaining > 0; }
+  public int getHappyHourTurnsRemaining() { return happyHourTurnsRemaining; }
+  public int getOrderPriceCents(Customer customer, MenuItem item) {
+    int price = (int)Math.round(item.getPriceCents() * customer.getPriceMultiplierPercent() / 100.0);
+    if(isHappyHourActive()) price = (int)Math.round(price * 0.80);
+    return price;
+  }
+
+  public void recoverWaitingSatisfaction() {
+    if(!isHappyHourActive()) return;
+    for(Customer customer : customerList) {
+      if(customer.canLoseSatisfaction()) customer.recoverSatisfaction(customer.getHappyHourRecovery());
+    }
   }
 
   // Parameterizing by T to remove the need for separate getter methods for each staff type
@@ -139,6 +160,7 @@ public class GameState {
   }
 
   public void advanceTurn() {
+    if(happyHourTurnsRemaining > 0) happyHourTurnsRemaining--;
     turnIndex++;
   }
 

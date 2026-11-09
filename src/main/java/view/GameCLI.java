@@ -148,6 +148,7 @@ public class GameCLI {
         add("Turn Number");
         add("Revenue");
         add("Average Satisfaction of Paid Customers");
+        add("Happy Hour Turns Remaining");
       }
     };
     
@@ -170,9 +171,10 @@ public class GameCLI {
           String.format("%1$,.2f", (double)(scoreboard.getTotSatisfaction()) / (double)(scoreboard.getNumPaid()))
           : "N/A"
         )
-      );
-    }
-  };
+        );
+        add(String.valueOf(state.getHappyHourTurnsRemaining()));
+      }
+    };
   
   ArrayList<ArrayList<String>> tableData = new ArrayList<>();
   

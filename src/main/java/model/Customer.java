@@ -32,6 +32,10 @@ public abstract class Customer {
     return 100;
   }
 
+  public int getHappyHourRecovery() {
+    return 15;
+  }
+
   public void leave() {
     if(state == CustomerState.WAITING || state == CustomerState.SEATED || state == CustomerState.ORDERED) {
       state = CustomerState.LEFT;
@@ -45,6 +49,10 @@ public abstract class Customer {
     if(satisfaction <= 0) {
       leave();
     }
+  }
+
+  public void recoverSatisfaction(int amount) {
+    satisfaction = Math.min(100, satisfaction + amount);
   }
 
   public boolean canLoseSatisfaction() {
