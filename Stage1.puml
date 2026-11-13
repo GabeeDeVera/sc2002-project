@@ -1,0 +1,322 @@
+@startuml model
+title Restaurant Rush - Model Package
+skinparam classAttributeIconSize 0
+left to right direction
+
+abstract class Staff {
+  - staffType : String
+  + getStaffType() : String
+}
+class Waiter {
+  + seat(customer : Customer, table : Table) : void
+  + takeOrder(customer : Customer, state : GameState) : void
+  + serve(order : Order, currentTurn : int) : void
+}
+class Chef {
+  + prepare(order : Order) : void
+}
+class Cashier {
+  + collectPayment(customers : ArrayList<Customer>) : Customer
+}
+Staff <|-- Waiter
+Staff <|-- Chef
+Staff <|-- Cashier
+
+abstract class Customer {
+  - {static} firstUnallocatedId : int
+  - id : int
+  - arrivalTurn : int
+  - satisfaction : int
+  - state : CustomerState
+  - servedTurn : int
+  - readyToPayTurn : int
+  - customerType : String
+  + {abstract} lossPerWaitingTurn() : int
+  + {abstract} chooseItem(menu : Menu) : MenuItem
+  + leave() : void
+  + lowerSatisfaction() : void
+  + canLoseSatisfaction() : boolean
+  + seatCustomer() : void
+  + setOrdered() : void
+  + setServed() : void
+  + setReadyToPay() : void
+  + setPaid() : void
+}
+class RegularCustomer {
+  + lossPerWaitingTurn() : int
+  + chooseItem(menu : Menu) : MenuItem
+}
+Customer <|-- RegularCustomer
+
+class Order {
+  - unitsLeft : int
+  - state : OrderState
+  + sendToKitchen() : void
+  + advanceOrderPreparation() : void
+  + markServed() : void
+  + markPaid() : void
+  + markCancelled() : void
+  + getBillCents() : int
+}
+class MenuItem {
+  - name : String
+  - priceCents : int
+  - preparationUnits : int
+}
+class Menu {
+  + getNumItems() : int
+  + getItem(index : int) : MenuItem
+  + findByName(name : String) : MenuItem
+}
+class Table {
+  - id : int
+  + isFree() : boolean
+  + setCustomer(customer : Customer) : void
+  + free() : void
+}
+class Scoreboard {
+  - revenueCents : int
+  - numPaid : int
+  - numServed : int
+  - numDepartures : int
+  - totSatisfaction : int
+  + recordPayment(cents : int, satisfaction : int) : void
+  + recordServed() : void
+  + recordDeparture() : void
+}
+class GameConfig {
+  - maxTurns : int
+  - tables : int
+  + getNewArrivals(turnIndex : int) : ArrayList<Customer>
+  + getMenu(turnIndex : int) : Menu
+  + checkVictory(state : GameState, scoreboard : Scoreboard) : boolean
+}
+class GameState {
+  - turnIndex : int
+  + addCustomersToQueues() : ArrayList<Customer>
+  + getValidWaiterActions() : ArrayList<WaiterAction>
+  + getValidChefActions() : ArrayList<ChefAction>
+  + freeTable(customer : Customer) : Table
+  + advanceTurn() : void
+  + checkVictory(scoreboard : Scoreboard) : boolean
+}
+class Price <<utility>> {
+  ~ {static} dollars(amount : int) : int
+  ~ {static} cents(amount : int) : int
+}
+
+enum CustomerState {
+  WAITING
+  SEATED
+  ORDERED
+  SERVED
+  READY_TO_PAY
+  PAID
+  LEFT
+}
+enum OrderState {
+  PLACED
+  PREPARING
+  READY
+  SERVED
+  PAID
+  CANCELLED
+}
+enum WaiterAction {
+  SEAT
+  TAKE_ORDER
+  SERVE
+  WAIT
+}
+enum ChefAction {
+  PREPARE
+  WAIT
+}
+
+Menu "1" o-- "*" MenuItem
+Order "*" --> "1" Customer
+Order "*" --> "1" MenuItem
+Customer "1" --> "0..1" Order
+Table "1" --> "0..1" Customer : serves
+GameConfig "1" *-- "*" Staff
+GameConfig ..> Menu : creates
+GameConfig ..> RegularCustomer : creates
+GameConfig ..> Price : uses
+GameConfig ..> Scoreboard : checks
+GameState "1" --> "1" GameConfig
+GameState "1" *-- "*" Table
+GameState "1" o-- "*" Customer : list + waiting queue
+GameState "1" o-- "*" Order
+Customer --> CustomerState
+Order --> OrderState
+GameState ..> WaiterAction
+GameState ..> ChefAction
+Waiter ..> Order : creates
+Waiter ..> GameState
+Cashier ..> Customer
+Chef ..> Order
+@enduml
+
+@startuml view
+title Restaurant Rush - View Package
+skinparam classAttributeIconSize 0
+
+interface IRendererCLI {
+  + render() : ArrayList<String>
+  + display() : void
+}
+interface IInputCLI {
+  + takeInput(sc : Scanner) : String
+}
+
+class ContentRendererCLI {
+  + setContent(content : ArrayList<String>) : void
+  + getWidth() : int
+}
+class BoxRendererCLI {
+  - topPadding : int
+  - bottomPadding : int
+  - leftPadding : int
+  - rightPadding : int
+  - renderTop : boolean
+  - minWidth : int
+  + activateTop() : void
+  + deactivateTop() : void
+  + setMinWidth(width : int) : void
+}
+class OrderedListRendererCLI {
+  + setItems(items : ArrayList<String>) : void
+}
+class TableViewCLI {
+  - showIndex : boolean
+  + setData(data : ArrayList<ArrayList<String>>) : void
+  + setHeaders(headers : ArrayList<String>) : void
+}
+class ChoiceRendererCLI {
+  + setChoices(choices : ArrayList<String>) : void
+  + setTitle(title : String) : void
+}
+class ChoiceScreenCLI {
+  + setChoices(choices : ArrayList<String>) : void
+  + setTitle(title : String) : void
+}
+class ScoreboardRendererCLI {
+  + setScoreboard(scoreboard : Scoreboard) : void
+  + getWidth() : int
+}
+class TitleCLI
+class ExitScreenCLI
+class ResultScreenCLI {
+  + setVictory(victory : boolean) : void
+  + setScoreboard(scoreboard : Scoreboard) : void
+}
+class PriceFormatter <<utility>> {
+  + {static} formatPrice(cents : int) : String
+  + {static} formatPriceWithDollars(cents : int) : String
+}
+class GameCLI {
+  - sc : Scanner
+  + showHomeScreen() : int
+  + showChoicesScreen(choices : ArrayList<String>, title : String) : int
+  + yesNoInput(message : String) : boolean
+  + confirmationInput() : void
+  + logEvent(event : String) : void
+  + logGeneric(message : String) : void
+  + showBoxedMessage(message : String) : void
+  + showPreliminaryStats(state, scoreboard, config) : void
+  + showWaitingQueue(state : GameState) : void
+  + showTableAvailability(state : GameState) : void
+  + showCustomerSatisfactions(state : GameState) : void
+  + showOrderStatus(state : GameState) : void
+  + showAvailableTasks(state : GameState) : void
+  + showScoreboardScreen(turn, maxTurns, scoreboard) : void
+  + showResultScreen(victory : boolean, scoreboard : Scoreboard) : void
+  + showExitScreen() : void
+}
+
+IRendererCLI <|.. ContentRendererCLI
+IRendererCLI <|.. BoxRendererCLI
+IRendererCLI <|.. OrderedListRendererCLI
+IRendererCLI <|.. TableViewCLI
+IRendererCLI <|.. ChoiceRendererCLI
+IRendererCLI <|.. ChoiceScreenCLI
+IRendererCLI <|.. ScoreboardRendererCLI
+IRendererCLI <|.. TitleCLI
+IRendererCLI <|.. ExitScreenCLI
+IRendererCLI <|.. ResultScreenCLI
+IInputCLI <|.. ChoiceRendererCLI
+IInputCLI <|.. ChoiceScreenCLI
+
+BoxRendererCLI o-- IRendererCLI : child
+ChoiceRendererCLI *-- OrderedListRendererCLI
+ChoiceScreenCLI *-- ChoiceRendererCLI
+ScoreboardRendererCLI *-- BoxRendererCLI
+ScoreboardRendererCLI *-- ContentRendererCLI
+TitleCLI *-- BoxRendererCLI
+ExitScreenCLI *-- BoxRendererCLI
+ResultScreenCLI *-- BoxRendererCLI
+ResultScreenCLI *-- ScoreboardRendererCLI
+
+GameCLI *-- TitleCLI
+GameCLI *-- ChoiceScreenCLI
+GameCLI *-- ScoreboardRendererCLI
+GameCLI *-- ResultScreenCLI
+GameCLI *-- ExitScreenCLI
+GameCLI *-- TableViewCLI
+GameCLI ..> PriceFormatter
+ScoreboardRendererCLI ..> PriceFormatter
+@enduml
+
+@startuml controller
+title Restaurant Rush - Controller and Utils
+skinparam classAttributeIconSize 0
+left to right direction
+
+class Main {
+  + {static} main(args : String[]) : void
+}
+class GameController {
+  - cli : GameCLI
+  - gameConfig : GameConfig
+  - state : GameState
+  - scoreboard : Scoreboard
+  + startGame() : void
+  - createNewGame() : void
+  - processArrivals() : void
+  - processPayment() : void
+  - processEating() : void
+  - processWaiterActions() : void
+  - processChefActions() : void
+  - processSatisfactionLossAndAbandonment() : void
+}
+class "TryUntilSucceedBlock<T>" as TryUntilSucceedBlock {
+  - tryBlock : Supplier<T>
+  - exceptionBlock : Consumer<Exception>
+  + execute() : T
+}
+class Callbacks <<utility>> {
+  + {static} errorLogger(e : Throwable) : void
+}
+class GrammarPoints <<utility>> {
+  + {static} nounPluralityQualifier(count : int) : String
+  + {static} linkingVerb(count : int) : String
+}
+class StringPadder <<utility>> {
+  + {static} padIntToLen(num : int, len : int) : String
+  + {static} padIntEndToLen(num : int, len : int) : String
+  + {static} padEndToLen(val : String, len : int) : String
+}
+class GameCLI
+class GameConfig
+class GameState
+class Scoreboard
+
+Main ..> GameController
+GameController *-- GameCLI
+GameController *-- GameConfig
+GameController *-- GameState
+GameController *-- Scoreboard
+GameController ..> TryUntilSucceedBlock
+GameController ..> Callbacks
+GameController ..> GrammarPoints
+@enduml
