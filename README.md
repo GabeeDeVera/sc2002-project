@@ -14,10 +14,16 @@ If you run into issues with stale `.class` build artifacts, run `python make_cle
 ## Video Timestamps
 
 00.00 [De Vera] Game Introduction
+
 01.27 [Jitsue] Stage 2 change analysis
+
 03.03 [Chaisrisawatsuk] Stage 3 change analysis
+
 05.05 [Dickson] Game Runthrough (One victory & One defeat)
+
 08.22 [Juthasuwansiri] Sequence Diagram
+
 09.31 [De Vera] SOLID principle analysis
+
 12.40 Individual Reflections
 
